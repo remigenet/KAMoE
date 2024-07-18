@@ -69,7 +69,7 @@ class MoE(Layer):
 
         for expert in self.experts:
             expert.build(input_shape)
-
+        del self.base_expert
         super().build(input_shape)
 
     def call(self, inputs):
