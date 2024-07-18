@@ -9,10 +9,10 @@ logger = logging.getLogger(__name__)
 class MoE(Layer):
     def __init__(self, base_expert, n_experts=4, gating_network_activation = 'sigmoid', dropout=0., **kwargs):
         super().__init__(**kwargs)
-        self.base_expert = base_expert
         self.n_experts = n_experts
         self.gating_network_activation = gating_network_activation
         self.experts = [clone_model(base_expert) for _ in range(n_experts)]
+        self.base_expert = self.experts[0]
         self.dropout = Dropout(dropout)
         self.input_is_sequence = None
         self.output_is_sequence = None
@@ -69,7 +69,6 @@ class MoE(Layer):
 
         for expert in self.experts:
             expert.build(input_shape)
-        del self.base_expert
         super().build(input_shape)
 
     def call(self, inputs):
