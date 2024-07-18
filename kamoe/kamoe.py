@@ -68,7 +68,8 @@ class MoE(Layer):
         self.hidden_to_weight.build(self.hidden_layer.compute_output_shape(weight_input_shape))
 
         for expert in self.experts:
-            expert.build(input_shape)
+            if not expert.built: 
+                expert.build(input_shape)
         super().build(input_shape)
 
     def call(self, inputs):
