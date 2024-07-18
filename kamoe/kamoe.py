@@ -13,6 +13,7 @@ class MoE(Layer):
         self.gating_network_activation = gating_network_activation
         self.experts = [clone_model(base_expert) for _ in range(n_experts)]
         self.base_expert = self.experts[0]
+        self.dropout_rate = dropout
         self.dropout = Dropout(dropout)
         self.input_is_sequence = None
         self.output_is_sequence = None
@@ -92,9 +93,36 @@ class MoE(Layer):
             weighted_outputs = expert_outputs * weights[..., tf.newaxis, :]
 
         return tf.reduce_sum(weighted_outputs, axis=-1)
+        
+    def get_config(self):
+        config = super().get_config()
+        config.update({
+            'base_expert': tf.keras.layers.serialize(self.base_expert),
+            'n_experts': self.n_experts,
+            'gating_network_activation': self.gating_network_activation,
+            'dropout': self.dropout_rate,
+        })
+        return config
+
+    @classmethod
+    def from_config(cls, config):
+        base_expert = tf.keras.layers.deserialize(config.pop('base_expert'))
+        return cls(base_expert, **config)
+
 
 class KAMoE(MoE):
     def __init__(self, *args, **kwargs):
         super().__init__(*args, **kwargs)
         self.gating_network_cls = GRKAN
 
+    def build(self, input_shape):
+        super().build(input_shape)
+
+    def get_config(self):
+        config = super().get_config()
+        return config
+
+    @classmethod
+    def from_config(cls, config):
+        base_expert = tf.keras.layers.deserialize(config.pop('base_expert'))
+        return cls(base_expert, **config)

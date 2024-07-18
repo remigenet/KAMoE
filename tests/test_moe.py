@@ -111,3 +111,9 @@ def test_kamoe_custom_rnn(random_input):
     kamoe_custom = KAMoE(custom_rnn, n_experts=5)
     output = kamoe_custom(random_input)
     assert output.shape == (1000, 64)
+
+def test_kamoe_moe(random_input):
+    moe = MoE(tf.keras.layers.Dense(64, activation='relu'), n_experts=4)
+    kamoe = KAMoE(moe, n_experts=4)
+    output = kamoe(random_input)
+    assert output.shape == (1000, 10, 64)
