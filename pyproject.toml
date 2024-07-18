@@ -1,0 +1,30 @@
+[build-system]
+requires = ["poetry-core"]
+build-backend = "poetry.core.masonry.api"
+
+[tool.poetry]
+name = "kamoe"
+version = "0.1.0"
+description = "Kolmogorov-Arnold Mixtures of Experts"
+authors = ["Rémi Genet", "Hugo Inzirillo"]
+readme = "README.md"
+packages = [{include = "kamoe"}]
+
+[tool.poetry.dependencies]
+python = ">=3.9,<4.0"
+tensorflow = ">=2.15,<3"
+
+
+[tool.poetry.dev-dependencies]
+pytest = ">=8.0.0,<9"
+numpy = ">=1.2,<3"
+
+[tool.pytest.ini_options]
+minversion = "6.0"
+addopts = "-ra -q"
+testpaths = [
+    "tests",
+]
+filterwarnings = [
+    "ignore:Type google.*uses PyType_Spec with a metaclass that has custom tp_new.*:DeprecationWarning"
+]
