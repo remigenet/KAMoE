@@ -11,8 +11,8 @@ readme = "README.md"
 packages = [{include = "kamoe"}]
 
 [tool.poetry.dependencies]
-python = ">=3.9,<4.0"
-tensorflow = ">=2.15,<3"
+python = ">=3.9,<3.12"
+keras = ">=3.0.0,<4.0"
 keras_efficient_kan = "^0.1.4"
 
 [tool.poetry.group.dev.dependencies]
