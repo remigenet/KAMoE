@@ -1,10 +1,11 @@
-name: KAMoE CI
+name: Run tests on multiple backends
 
 on:
   push:
     branches: [ main ]
   pull_request:
     branches: [ main ]
+
 
 jobs:
   test:
@@ -25,4 +26,4 @@ jobs:
         poetry install
     - name: Run tests
       run: |
-        poetry run pytest
+        poetry run python run_tests.py

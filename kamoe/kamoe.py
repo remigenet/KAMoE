@@ -1,6 +1,8 @@
-import tensorflow as tf
-from tensorflow.keras.layers import Layer, Dense, Dropout, RNN
-from tensorflow.keras.models import Sequential, clone_model
+import keras
+from keras import ops
+from keras import Input
+from keras.layers import Layer, Dense, Dropout, RNN
+from keras.models import Sequential, clone_model
 from kamoe import GRKAN, GRN
 import logging
 
@@ -25,7 +27,7 @@ class MoE(Layer):
         self.input_is_sequence = len(input_shape) == 3
 
         # Build one expert to determine output shape
-        test_input = tf.keras.Input(shape=input_shape[1:])
+        test_input = Input(shape=input_shape[1:])
         test_output = self.base_expert(test_input)
         self.output_shape = test_output.shape
         self.output_is_sequence = len(self.output_shape) == 3
@@ -76,7 +78,7 @@ class MoE(Layer):
     def call(self, inputs):
         if self.input_is_sequence:
             if self.flatten_input:
-                hidden = self.hidden_layer(tf.reshape(inputs, (tf.shape(inputs)[0], -1)))
+                hidden = self.hidden_layer(ops.reshape(inputs, (ops.shape(inputs)[0], -1)))
             elif not self.output_is_sequence:
                 hidden = self.hidden_layer(inputs[:, -1, :])
             else:
@@ -85,19 +87,17 @@ class MoE(Layer):
             hidden = self.hidden_layer(inputs)
 
         weights = self.hidden_to_weight(hidden)
-        expert_outputs = tf.stack([expert(inputs) for expert in self.experts], axis=-1)
+        expert_outputs = ops.stack([expert(inputs) for expert in self.experts], axis=-1)
 
-        if self.output_is_sequence:
-            weighted_outputs = expert_outputs * weights[..., tf.newaxis, :]
-        else:
-            weighted_outputs = expert_outputs * weights[..., tf.newaxis, :]
+        
+        weighted_outputs = expert_outputs * ops.expand_dims(weights, axis=-2)
 
-        return tf.reduce_sum(weighted_outputs, axis=-1)
+        return ops.sum(weighted_outputs, axis=-1)
         
     def get_config(self):
         config = super().get_config()
         config.update({
-            'base_expert': tf.keras.layers.serialize(self.base_expert),
+            'base_expert': keras.layers.serialize(self.base_expert),
             'n_experts': self.n_experts,
             'gating_network_activation': self.gating_network_activation,
             'dropout': self.dropout_rate,
@@ -106,7 +106,7 @@ class MoE(Layer):
 
     @classmethod
     def from_config(cls, config):
-        base_expert = tf.keras.layers.deserialize(config.pop('base_expert'))
+        base_expert = keras.layers.deserialize(config.pop('base_expert'))
         return cls(base_expert, **config)
 
 
@@ -124,5 +124,5 @@ class KAMoE(MoE):
 
     @classmethod
     def from_config(cls, config):
-        base_expert = tf.keras.layers.deserialize(config.pop('base_expert'))
+        base_expert = keras.layers.deserialize(config.pop('base_expert'))
         return cls(base_expert, **config)
