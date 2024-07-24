@@ -9,7 +9,7 @@ import logging
 logger = logging.getLogger(__name__)
 
 class MoE(Layer):
-    def __init__(self, base_expert, n_experts=4, gating_network_activation = 'sigmoid', dropout=0., **kwargs):
+    def __init__(self, base_expert, n_experts=3, gating_network_activation = 'sigmoid', dropout=0., **kwargs):
         super().__init__(**kwargs)
         self.n_experts = n_experts
         self.gating_network_activation = gating_network_activation
@@ -24,6 +24,11 @@ class MoE(Layer):
         self.gating_network_cls = GRN
 
     def build(self, input_shape):
+        self.attention_kernel = self.add_weight(
+            shape=(1, *input_shape[1:]),
+            name="attention_kernel",
+            initializer="ones",
+        )
         self.input_is_sequence = len(input_shape) == 3
 
         # Build one expert to determine output shape
@@ -76,6 +81,7 @@ class MoE(Layer):
         super().build(input_shape)
 
     def call(self, inputs):
+        inputs = inputs * self.attention_kernel
         if self.input_is_sequence:
             if self.flatten_input:
                 hidden = self.hidden_layer(ops.reshape(inputs, (ops.shape(inputs)[0], -1)))
