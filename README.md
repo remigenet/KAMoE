@@ -6,7 +6,7 @@ This Keras implementation integrates KAMoE (and MoE) as a layer that takes as in
 It is compatible with any backend, and can be used with any layer or model.
 In case of sequential model, the MoE (or KAMoE) will look if the input shape has the same number of dimension in input and output, if there is one less dimension it will search for a layer with a return_sequences=False in the expert. In that case it will only use the last element of the sequence for the gating, otherwise it will flatten the whole sequence to use it as input for the gating. In any other case it will use the whole input as input for the gating.
 The implementation is tested to be compatatible with Tensorflow, Jax and Torch. From testing jax is the best backend in terms of performance with it, while torch is very slow (mostly due to keras handling of pytorch than anything else for the moment I believe).
-It is the original implementation of the [paper]()
+It is the original implementation of the [paper](https://arxiv.org/abs/2409.15161)
 The KAN part implementation has been inspired from [efficient_kan](https://github.com/Blealtan/efficient-kan), and is available [here](https://github.com/remigenet/keras_efficient_kan) and works similarly to it, thus not exactly like the [original implementation](https://github.com/KindXiaoming/pykan).
 
 In case of performance consideration, the best setup tested used [nvidia cuda docker image](https://hub.docker.com/r/nvidia/cuda) followed by installing jax using ```pip install "jax[cuda12]"```, this is what is used in the example section.
