@@ -1,6 +1,6 @@
 # Kolmogorov-Arnold Mixture of Experts
 
-
+ 
 Kolmogorov-Arnold Mixture of Experts is a Mixture of Expert framework that can be applied on any Layer or Model. 
 This Keras implementation integrates KAMoE (and MoE) as a layer that takes as inputs in initialization another layer or model, and create a mixture of experts framework over it. 
 It is compatible with any backend, and can be used with any layer or model.
